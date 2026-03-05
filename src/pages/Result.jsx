@@ -21,9 +21,16 @@ export default function Result() {
         totalTime: gameState.totalTime,
         date: new Date().toISOString(),
       });
+
       setSaved(true);
     }
-  }, [saved]);
+  }, [
+    saved,
+    gameState.username,
+    gameState.difficulty,
+    gameState.totalTime,
+    saveToLeaderboard,
+  ]);
 
   const achievements = [];
   if (gameState.totalTime < 180)

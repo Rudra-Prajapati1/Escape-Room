@@ -14,17 +14,20 @@ export default function Typewriter({
     setDisplayed("");
     setDone(false);
     let i = 0;
+
     intervalRef.current = setInterval(() => {
       i++;
       setDisplayed(text.slice(0, i));
+
       if (i >= text.length) {
         clearInterval(intervalRef.current);
         setDone(true);
         if (onComplete) onComplete();
       }
     }, speed);
+
     return () => clearInterval(intervalRef.current);
-  }, [text, speed]);
+  }, [text, speed, onComplete]);
 
   const skip = () => {
     if (done) return;
