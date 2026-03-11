@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 export default function Typewriter({
   text,
@@ -6,48 +6,19 @@ export default function Typewriter({
   onComplete,
   className = "",
 }) {
-  const [displayed, setDisplayed] = useState("");
-  const [done, setDone] = useState(false);
-  const intervalRef = useRef(null);
+  const onCompleteRef = useRef(onComplete);
 
   useEffect(() => {
-    setDisplayed("");
-    setDone(false);
-    let i = 0;
+    onCompleteRef.current = onComplete;
+  });
 
-    intervalRef.current = setInterval(() => {
-      i++;
-      setDisplayed(text.slice(0, i));
-
-      if (i >= text.length) {
-        clearInterval(intervalRef.current);
-        setDone(true);
-        if (onComplete) onComplete();
-      }
-    }, speed);
-
-    return () => clearInterval(intervalRef.current);
-  }, [text, speed, onComplete]);
-
-  const skip = () => {
-    if (done) return;
-    clearInterval(intervalRef.current);
-    setDisplayed(text);
-    setDone(true);
-    if (onComplete) onComplete();
-  };
+  useEffect(() => {
+    onCompleteRef.current?.();
+  }, [text]);
 
   return (
-    <div onClick={skip} className="cursor-pointer">
-      <p className={className}>
-        {displayed}
-        {!done && <span className="animate-pulse">|</span>}
-      </p>
-      {!done && (
-        <p className="text-slate-600 text-xs mt-4 text-right">
-          Click to skip →
-        </p>
-      )}
+    <div className="cursor-pointer">
+      <p className={className}>{text}</p>
     </div>
   );
 }

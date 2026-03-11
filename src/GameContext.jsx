@@ -57,8 +57,11 @@ export function GameProvider({ children }) {
   const setDifficulty = (d) =>
     setGameState((prev) => ({ ...prev, difficulty: d }));
 
-  const nextLevel = useCallback(() => {
+  const nextLevel = useCallback((expectedLevel = null) => {
     setGameState((prev) => {
+      if (expectedLevel !== null && prev.currentLevel !== expectedLevel) {
+        return prev;
+      }
       const now = Date.now();
       const levelTime = prev.startTime
         ? Math.floor((now - prev.startTime) / 1000)

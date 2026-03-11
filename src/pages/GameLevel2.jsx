@@ -18,13 +18,11 @@ const EMOJIS = [
   "🏴",
 ];
 
-// Returns the best [cols, rows] for a given number of cards
 function getGridLayout(totalCards) {
-  // totalCards is always even (pairs * 2)
   const layouts = {
-    12: [4, 3], // Easy:   6 pairs  = 12 cards → 4×3
-    16: [4, 4], // Medium: 8 pairs  = 16 cards → 4×4 ✓ perfect square
-    20: [5, 4], // Hard:   10 pairs = 20 cards → 5×4
+    12: [4, 3],
+    16: [4, 4],
+    20: [5, 4],
   };
   return layouts[totalCards] || [4, Math.ceil(totalCards / 4)];
 }
@@ -84,7 +82,7 @@ export default function GameLevel2() {
   }
 
   const [cols] = getGridLayout(cards.length);
-  const cardSize = cols === 5 ? 68 : 76; // slightly smaller cards for 5-col grid
+  const cardSize = cols === 5 ? 68 : 76;
 
   return (
     <section className="min-h-screen bg-gradient-to-b from-gray-950 via-slate-900 to-gray-950 pt-16 pb-8 px-4">

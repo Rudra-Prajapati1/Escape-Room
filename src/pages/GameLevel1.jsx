@@ -4,7 +4,6 @@ import TransitionScreen from "../components/TransitionScreen";
 import GameHUD from "../components/GameHUD";
 
 function generateGuaranteedHints(pwd, count) {
-  // Always include at least 2 direct digit hints so puzzle is always solvable
   const direct = [
     { text: `The first digit is ${pwd[0]}`, location: "Scratched on the wall" },
     {
@@ -48,7 +47,6 @@ function generateGuaranteedHints(pwd, count) {
     },
   ];
 
-  // Always start with 2 guaranteed direct hints, fill rest from extras
   const base = direct.slice(0, Math.min(2, count));
   const remaining = [...direct.slice(2), ...extra]
     .sort(() => Math.random() - 0.5)
@@ -58,7 +56,12 @@ function generateGuaranteedHints(pwd, count) {
 }
 
 export default function GameLevel1() {
-  const { nextLevel, config, loseLife } = useGame();
+  const {
+    nextLevel,
+    config,
+    loseLife,
+    gameState: { currentLevel },
+  } = useGame();
   const [phase, setPhase] = useState("intro");
   const [password, setPassword] = useState("");
   const [inputVal, setInputVal] = useState("");
@@ -69,6 +72,7 @@ export default function GameLevel1() {
   const [showRevealConfirm, setShowRevealConfirm] = useState(false);
   const [answerRevealed, setAnswerRevealed] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   useEffect(() => {
     const pwd = String(Math.floor(1000 + Math.random() * 9000));
@@ -83,9 +87,12 @@ export default function GameLevel1() {
   };
 
   const checkPassword = () => {
+    if (isCompleting) return;
+
     if (inputVal === password) {
+      setIsCompleting(true);
       setMessage("Correct! The computer unlocks...");
-      setTimeout(() => nextLevel(), 1500);
+      setTimeout(() => nextLevel(currentLevel), 1500);
     } else {
       setAttempts((a) => a + 1);
       setMessage("Wrong password. Try again.");
@@ -134,7 +141,6 @@ export default function GameLevel1() {
           </p>
         </div>
 
-        {/* Hint grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
           {hints.map((hint, i) => (
             <button
@@ -161,8 +167,6 @@ export default function GameLevel1() {
             </button>
           ))}
         </div>
-
-        {/* Password input */}
         <div className="bg-slate-800/50 border border-slate-700/40 rounded-lg p-6 max-w-sm mx-auto">
           <div className="bg-slate-900 rounded p-4 mb-4 border border-slate-700/30">
             <p className="text-green-400 text-xs font-mono mb-2">
@@ -183,16 +187,19 @@ export default function GameLevel1() {
                 setInputVal(e.target.value.replace(/\D/g, "").slice(0, 4))
               }
               onKeyDown={(e) =>
-                e.key === "Enter" && inputVal.length === 4 && checkPassword()
+                e.key === "Enter" &&
+                inputVal.length === 4 &&
+                !isCompleting &&
+                checkPassword()
               }
               placeholder="_ _ _ _"
               className="flex-1 bg-slate-900 border border-slate-600/40 rounded px-4 py-3 text-white text-center text-xl font-mono tracking-[0.5em] outline-none focus:border-amber-500/50 transition-colors placeholder:text-slate-700"
               maxLength={4}
-              readOnly={answerRevealed}
+              readOnly={answerRevealed || isCompleting}
             />
             <button
               onClick={checkPassword}
-              disabled={inputVal.length !== 4}
+              disabled={inputVal.length !== 4 || isCompleting}
               className="px-6 py-3 bg-amber-500 text-gray-900 font-bold rounded hover:bg-amber-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               ↵
@@ -207,7 +214,6 @@ export default function GameLevel1() {
             </p>
           )}
 
-          {/* Reveal answer section — shows after 2 failed attempts */}
           {attempts >= 2 && !answerRevealed && (
             <div className="border-t border-slate-700/30 pt-4 mt-2">
               {!showRevealConfirm ? (

@@ -15,7 +15,6 @@ export default function AppInner() {
   const { gameState } = useGame();
   const { currentLevel, lives } = gameState;
 
-  // Game over — no lives left and mid-game
   if (lives === 0 && currentLevel >= 2 && currentLevel <= 6) {
     return <GameOverScreen />;
   }
